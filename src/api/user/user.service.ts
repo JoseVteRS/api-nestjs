@@ -27,18 +27,13 @@ export class UserService {
 	async getOne(id: string, userSchema?: User) {
 		const user = await this.userModel.findOne({ _id: id })
 		.then(u => (!userSchema ? u : !!u && userSchema._id === u._id ? u : null))
-		// .then( (u) => {
-		// 	console.log('u: -->', u);
-		// 	console.log('userSchema: -->', userSchema);
-		// 	return !userSchema ? u._id : !!u._id && userSchema._id === u._id ? u._id : null;
-		// });
 
-
+		console.log('\n --------- user.service.ts - getOne --> ANTES DE IF usuario parametros userSchema --------- \n', user, '\n\n');
 
 		if (!user) {
 			throw new NotFoundException('User does not exists or unauthorized');
 		}
-		console.log('user.service.ts', user);
+		console.log('\n --------- user.service.ts - getOne --> DESPUES DE IF usuario parametros userSchema --------- \n', user, '\n\n');
 		return user;
 	}
 
@@ -62,8 +57,22 @@ export class UserService {
 
 	async editOne(id: string, dto: EditUserDto, userEntity?: User) {
 		const user = await this.getOne(id, userEntity);
-		const editedUser = Object.assign(user._id, dto);
-		return await this.userModel.findByIdAndUpdate(editedUser, { new: true });
+		// const editedUser = Object.assign(user._id, dto);
+
+		console.group('\n --------- user.service.ts - editOne - const = user ---------\n');
+		console.log(user);
+		console.groupEnd();
+
+		// FIXME: Sale undefined cuando el usuario es el mismo
+		console.group('\n --------- user.service.ts - editOne - userEntity: User ---------\n');
+		console.log(userEntity);
+		console.groupEnd();
+
+		// console.group('\n --------- editOne - editUser ---------\n');
+		// console.log(editedUser);
+		// console.groupEnd();
+
+		return await this.userModel.findByIdAndUpdate(id, dto, { new: true });
 	}
 
 

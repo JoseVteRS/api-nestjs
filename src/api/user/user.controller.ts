@@ -8,7 +8,7 @@ import { UserService } from './user.service';
 import { AppResource, AppRoles } from '../../app.roles';
 import { Auth, UserRequest } from 'src/common/decorators';
 import { RolesBuilder, InjectRolesBuilder } from 'nest-access-control';
-import { User, UserSchema } from './schemas/user.schema';
+import { User } from './schemas/user.schema';
 import { UserRegistrationDto } from './dtos/user-signup.dto';
 
 
@@ -76,8 +76,8 @@ export class UserController {
 	) {
 		let data: any;
 		const rule =  this.rolesBuilder.can(user.roles).updateAny(AppResource.USER).granted;
-		console.log('user.controler.ts - Usuario que viene del request', user)
-		console.log('user.controler.ts - id que llega de los parmas', id)
+		console.log('\n --------- user.controler.ts - Usuario que viene del request --------- \n\n', user)
+		console.log('\n--------- user.controler.ts - id que llega de los parmas --------- \n\n', id)
 		if (rule) {
 			// esto es un admin
 			data = await this.userService.editOne(id, dto);
