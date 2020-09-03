@@ -75,7 +75,9 @@ export class UserController {
 		@UserRequest() user: User,
 	) {
 		let data: any;
-		const rule = this.rolesBuilder.can(user.roles).updateAny(AppResource.USER).granted;
+		const rule =  this.rolesBuilder.can(user.roles).updateAny(AppResource.USER).granted;
+		console.log('user.controler.ts - Usuario que viene del request', user)
+		console.log('user.controler.ts - id que llega de los parmas', id)
 		if (rule) {
 			// esto es un admin
 			data = await this.userService.editOne(id, dto);
@@ -108,7 +110,5 @@ export class UserController {
 		}
 		return { message: 'User deleted', data };
 	}
-
-
 
 }
