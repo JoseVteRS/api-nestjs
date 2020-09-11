@@ -72,10 +72,6 @@ export class User extends Document {
 	@Prop({ type: Date, trim: true })
 	updatedAt: Date;
 
-
-
-
 }
-
 
 export const UserSchema = SchemaFactory.createForClass(User);

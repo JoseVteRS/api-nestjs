@@ -1,13 +1,15 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { nanoid } from 'nanoid';
 
 import { User } from './schemas/user.schema';
 import { CreateUserDto, EditUserDto } from './dtos';
-import * as bcrypt from 'bcryptjs';
-import { nanoid } from 'nanoid';
 import { AppRoles } from '../../app.roles';
+import * as bcrypt from 'bcryptjs';
 
+
+// (!userSchema ? u._id : !!u._id && userSchema._id === u._id ? u._id : null)
 
 @Injectable()
 export class UserService {
@@ -16,122 +18,70 @@ export class UserService {
 	) { }
 
 
-
 	async getMany() {
-		const users = await this.userModel.find()
-		if (!users) throw new NotFoundException('No ha sido posible mostrar los usuarios')
-		return {
-			status: 'OK',
-			statusCode: 200,
-			message: 'Todos los usuarios',
-			users: users,
-			total: users.length
+		const users = await this.userModel.find();
+		if (!users) {
+			throw new NotFoundException('No se ha podido cargar los usuarios. Inténtalo más tarde')
 		}
+		return users;
 	}
 
 
-
-	async getOne(uid: string, userSchema?: User) {
+	async getOne(id: string, userEntity?: User) {
 		const user = await this.userModel
-			.findOne({uid}).exec()
-			.then(usr => (!userSchema ? usr : !!usr && userSchema.uid === usr.uid ? usr : null) );
+		.findById(id)
+		.then(u => (!userEntity ? u : !!u && userEntity.id === u.id ? u : null));
 
-		console.group('\n\n ------------------ user.service.ts ------------------ \n')
+	  if (!user)
+		throw new NotFoundException('User does not exists or unauthorized');
 
-		console.group('\n ----- const user = findById (mongoose) ----- \n')
-		console.log('User @UserService', user);
-		console.groupEnd()
-
-		console.group('\n\n ----- userSchema?: User (2n parámetro getOne() ) ----- \n')
-		console.log('User @UserService userSchema', user);
-		console.groupEnd()
-
-		console.groupEnd()
-
-		if (!user) {
-			throw new NotFoundException('User does not exists or unauthorized');
-		}
-		return user;
+	  return user;
 	}
 
+	async checkOne(id: string, userShema?: User) {
+		const user = await this.userModel.findById(id);
 
-
-	async getManyAsPublic() {
-		const users = await this.userModel.find()
-		if (!users) throw new NotFoundException('No ha sido posible mostrar los usuarios')
-		const filterIsPublic = users.filter(user => user.isPublic === true)
-		const sanitized = filterIsPublic.map(user => {
-			user.password = undefined
-			user.email = undefined
+		if (userShema && userShema._id === user._id) {
 			return user
-		})
-		return {
-			status: 'OK',
-			statusCode: 200,
-			message: 'Todos los usuarios con perfiles públicos',
-			users: sanitized,
-			total: sanitized.length
+		} else {
+			return null
 		}
 	}
-
 
 
 	async createOne(dto: CreateUserDto) {
 		const userExistByEmail = await this.userModel.findOne({ email: dto.email })
 		if (userExistByEmail) throw new BadRequestException('Usuario ya existe con ese email')
+
 		const alias = `@${dto.alias}`
-		const userExistByalias = await this.userModel.findOne({ alias: alias })
+		const userExistByalias = await this.userModel.findOne({ alias })
+
 		if (userExistByalias) throw new BadRequestException(`El alias '@${dto.alias}' ya existe. Intenta con otro`)
+
 		const dtoAlias = dto.alias = `@${dto.alias}`;
 		const dtoPassword = dto.password = await bcrypt.hash(dto.password, 10);
 		const dtoNanoid = dto.uid = nanoid();
 		const dtoRoles = dto.roles = [AppRoles.BASIC_USER]
+
 		return await new this.userModel({ ...dto, dtoAlias, dtoPassword, dtoNanoid, dtoRoles }).save()
 	}
 
-
-
-	async editOne(id: string, dto: EditUserDto, userSchema?: User) {
-		await this.getOne(id, userSchema)
-		const alias = `@${dto.alias}`;
-		const userExistByAlias = await this.userModel.findOne({ alias: alias });
-		if (userExistByAlias) throw new BadRequestException(`El alias '@${dto.alias}' ya existe. Intenta con otro`);
-		dto.updatedAt = new Date();
-		if (dto.alias) dto.alias = alias;
-		// const test = Object.assign(user, dto);
-		const editedUser = await this.userModel.findByIdAndUpdate(id, dto, { new: true });
-		return this.sanitizeUser(editedUser);
+	async editOne(id: string, dto: EditUserDto, userEntity?: User) {
+		console.log(dto, '----------------------- \n\n\n\n\n\n');
+		const user = await this.getOne(id, userEntity);
+		// const editedUser = Object.assign(user._id, dto);
+		return await this.userModel.findByIdAndUpdate(user._id, dto, { new: true });
 	}
 
 
 
-	async deleteOne(id: string, userSchema?: User) {
-		const user = await this.getOne(id, userSchema);
-		console.log('deleteOne', userSchema);
-		// if (!user) throw new NotFoundException('No se ha podido borrar el usuario');
-		const deletedUser = await this.userModel.findByIdAndDelete(user);
-		return {
-			message: 'Usuario borrado correctamente',
-			deletedUser: this.sanitizeUser(deletedUser)
-		}
+	async deleteOne(id: string, userEntity?: User) {
+		const user = await this.getOne(id);
+		return await this.userModel.findByIdAndDelete(user);
 	}
 
 
-
-	// auth.service.ts
-	async getOneByEmail(email: string) {
-		const user = await this.userModel.findOne({ email });
-		if (!user) throw new NotFoundException('No existe el usuario');
-		return user;
-	}
-
-	async getOneById(id: string) {
-		const user = await this.userModel.findById({ _id: id })
-		return user
-	}
-
-
-
+	// FUNCIONES ------------------
 	sanitizeUser(user: User) {
 		const sanitized = user.toObject()
 		delete sanitized['password'];

@@ -21,7 +21,7 @@ export class AuthService {
 
 
 	async signIn(user: User) {
-		const payload = { sub: user.uid }
+		const payload = { sub: user._id }
 		user.password = undefined
 		console.log(user)
 		return {
