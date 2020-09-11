@@ -76,7 +76,7 @@ export class UserController {
 	) {
 		let data: any;
 		const rule =  this.rolesBuilder.can(user.roles).updateAny(AppResource.USER).granted;
-		console.log('\n --------- user.controler.ts - Usuario que viene del request --------- \n\n', user)
+		console.log('\n --------- user.controler.ts - Usuario que viene del request --------- \n\n', user._id)
 		console.log('\n--------- user.controler.ts - id que llega de los parmas --------- \n\n', id)
 		if (rule) {
 			// esto es un admin

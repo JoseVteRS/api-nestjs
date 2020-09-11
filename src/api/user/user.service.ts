@@ -19,22 +19,33 @@ export class UserService {
 
 
 	async getMany() {
-		return await this.userModel.find();
+		const users = await this.userModel.find();
+		if (!users) {
+			throw new NotFoundException('No se ha podido cargar los usuarios. Inténtalo más tarde')
+		}
+		return users;
 	}
 
 
+	async getOne(id: string, userEntity?: User) {
+		const user = await this.userModel
+		.findById(id)
+		.then(u => (!userEntity ? u : !!u && userEntity.id === u.id ? u : null));
 
-	async getOne(id: string, userSchema?: User) {
-		const user = await this.userModel.findOne({ _id: id })
-		.then(u => (!userSchema ? u : !!u && userSchema._id === u._id ? u : null))
+	  if (!user)
+		throw new NotFoundException('User does not exists or unauthorized');
 
-		console.log('\n --------- user.service.ts - getOne --> ANTES DE IF usuario parametros userSchema --------- \n', user, '\n\n');
+	  return user;
+	}
 
-		if (!user) {
-			throw new NotFoundException('User does not exists or unauthorized');
+	async checkOne(id: string, userShema?: User) {
+		const user = await this.userModel.findById(id);
+
+		if (userShema && userShema._id === user._id) {
+			return user
+		} else {
+			return null
 		}
-		console.log('\n --------- user.service.ts - getOne --> DESPUES DE IF usuario parametros userSchema --------- \n', user, '\n\n');
-		return user;
 	}
 
 
@@ -56,32 +67,18 @@ export class UserService {
 	}
 
 	async editOne(id: string, dto: EditUserDto, userEntity?: User) {
+		console.log(dto, '----------------------- \n\n\n\n\n\n');
 		const user = await this.getOne(id, userEntity);
 		// const editedUser = Object.assign(user._id, dto);
-
-		console.group('\n --------- user.service.ts - editOne - const = user ---------\n');
-		console.log(user);
-		console.groupEnd();
-
-		// FIXME: Sale undefined cuando el usuario es el mismo
-		console.group('\n --------- user.service.ts - editOne - userEntity: User ---------\n');
-		console.log(userEntity);
-		console.groupEnd();
-
-		// console.group('\n --------- editOne - editUser ---------\n');
-		// console.log(editedUser);
-		// console.groupEnd();
-
-		return await this.userModel.findByIdAndUpdate(id, dto, { new: true });
+		return await this.userModel.findByIdAndUpdate(user._id, dto, { new: true });
 	}
 
 
 
 	async deleteOne(id: string, userEntity?: User) {
-		const user = await this.getOne(id, userEntity);
-		return await this.userModel.findByIdAndDelete(user._id);
+		const user = await this.getOne(id);
+		return await this.userModel.findByIdAndDelete(user);
 	}
-
 
 
 	// FUNCIONES ------------------
