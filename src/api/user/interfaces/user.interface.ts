@@ -12,7 +12,7 @@ export interface User extends Document {
 	secretKeyConfirmation: string
 	isAdmin: boolean
 	roles: string[]
-	isValid: boolean
+	active: boolean
 	isPublic: boolean
 	isVerifiedAccount: boolean
 	createdAt: Date

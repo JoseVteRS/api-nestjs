@@ -18,7 +18,7 @@ import { AuthController } from './auth.controller';
 			defaultStrategy: 'jwt'
 		}),
 		ConfigModule.forRoot(),
-		MongooseModule.forFeature([{name: 'User', schema: UserSchema}], 'book'),
+		MongooseModule.forFeature([{name: 'User', schema: UserSchema}]),
 		JwtModule.register({
 			secret: process.env.JWT_SECRET,
 			signOptions: { expiresIn: '24h'}

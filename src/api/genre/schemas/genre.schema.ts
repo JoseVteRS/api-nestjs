@@ -5,6 +5,9 @@ export const GenreSchema = new Schema({
 	slug: { type: String, required: false },
 	uriPhoto: { type: String, required: false },
 	registeredBy: { type: Schema.Types.ObjectId, ref: 'User' },
-	createdAt: { type: Date, default: Date.now },
-	updatedAt: { type: Date, required: false },
-});
+},
+{
+	timestamps: true,
+	versionKey: false
+}
+);

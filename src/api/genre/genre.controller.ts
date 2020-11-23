@@ -5,16 +5,25 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { GenreService } from './genre.service';
 import { CreateGenreDto, EditGenreDto } from './dtos';
 import { ApiTags } from '@nestjs/swagger';
+import { Auth } from '../../common/decorators/auth.decorator';
+import { AppResource } from '../../app.roles';
+import { RolesBuilder, InjectRolesBuilder } from 'nest-access-control';
 
 @ApiTags('Genres')
 @Controller('genre')
 export class GenreController {
 
 	constructor(
-		private readonly genreService: GenreService
+		private readonly genreService: GenreService,
+		@InjectRolesBuilder()
+		private readonly rolesBuilder: RolesBuilder
 	) { }
 
-	@UseGuards(JwtAuthGuard)
+	@Auth({
+		possession: 'any',
+		action: 'create',
+		resource: AppResource.GENRE,
+	})
 	@Post()
 	async createOne(
 		@UserRequest() user: any,
@@ -46,7 +55,11 @@ export class GenreController {
 		return genre
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@Auth({
+		possession: 'any',
+		action: 'update',
+		resource: AppResource.GENRE,
+	})
 	@Put(':id')
 	async editOne(
 		@Param('id') id: string,
@@ -56,7 +69,11 @@ export class GenreController {
 		return editedGenre
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@Auth({
+		possession: 'any',
+		action: 'delete',
+		resource: AppResource.GENRE,
+	})
 	@Put(':id')
 	async deleteOne(
 		@Param('id') id: string,

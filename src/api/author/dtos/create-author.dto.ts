@@ -1,4 +1,4 @@
-// import { User } from './../../user/interfaces/user.interface';
+
 import { IsString, IsOptional, IsNotEmpty, IsMongoId, IsDateString } from 'class-validator';
 
 export class CreateAuthorDto {
@@ -28,14 +28,4 @@ export class CreateAuthorDto {
 	@IsOptional()
 	@IsMongoId()
 	registeredBy: string;
-
-	@IsString()
-	@IsDateString()
-	@IsOptional()
-	createdAt: Date;
-
-	@IsString()
-	@IsDateString()
-	@IsOptional()
-	updatedAt: Date;
 };

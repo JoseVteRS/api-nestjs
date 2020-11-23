@@ -1,3 +1,4 @@
+import { User } from './interfaces/user.interface';
 
 import { Controller, Post, Body, Get, Param, Put, Delete } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -5,12 +6,9 @@ import { ApiTags } from '@nestjs/swagger';
 import { CreateUserDto, EditUserDto } from './dtos';
 import { UserService } from './user.service';
 
-import { AppResource, AppRoles } from '../../app.roles';
+import { AppResource } from '../../app.roles';
 import { Auth, UserRequest } from 'src/common/decorators';
 import { RolesBuilder, InjectRolesBuilder } from 'nest-access-control';
-import { User } from './schemas/user.schema';
-import { UserRegistrationDto } from './dtos/user-signup.dto';
-
 
 
 @ApiTags('Users')
@@ -28,24 +26,13 @@ export class UserController {
 	async getMany() {
 		const data = await this.userService.getMany();
 
-		return { data };
+		return { staus: 'OK', statusCode: 200, data };
 	}
-
-
-	@Post('register')
-	async publicRegistration(@Body() dto: UserRegistrationDto) {
-		const data = await this.userService.createOne({
-			...dto,
-			roles: [AppRoles.BASIC_USER]
-		});
-		return { message: 'User registered', data }
-	}
-
 
 	@Get(':id')
 	async getOne(@Param('id') id: string) {
 		const data = await this.userService.getOne(id);
-		return { data };
+		return { staus: 'OK', statusCode: 200, data };
 	}
 
 
@@ -58,9 +45,8 @@ export class UserController {
 	@Post()
 	async createOne(@Body() dto: CreateUserDto) {
 		const data = await this.userService.createOne(dto);
-		return { message: 'User created', data };
+		return { status: 'OK', statusCode: 201, message: 'User created', data };
 	}
-
 
 
 	@Auth({
@@ -75,9 +61,7 @@ export class UserController {
 		@UserRequest() user: User,
 	) {
 		let data: any;
-		const rule =  this.rolesBuilder.can(user.roles).updateAny(AppResource.USER).granted;
-		console.log('\n --------- user.controler.ts - Usuario que viene del request --------- \n\n', user._id)
-		console.log('\n--------- user.controler.ts - id que llega de los parmas --------- \n\n', id)
+		const rule = this.rolesBuilder.can(user.roles).updateAny(AppResource.USER).granted;
 		if (rule) {
 			// esto es un admin
 			data = await this.userService.editOne(id, dto);
@@ -87,7 +71,7 @@ export class UserController {
 			const { roles, ...rest } = dto;
 			data = await this.userService.editOne(id, rest, user);
 		}
-		return { message: 'User edited', data };
+		return { status: 'OK', statusCode: 200, message: 'User edited', data };
 	}
 
 
@@ -108,7 +92,7 @@ export class UserController {
 			// esto es un author
 			data = await this.userService.deleteOne(id, user);
 		}
-		return { message: 'User deleted', data };
+		return { status: 'OK', statusCode: 200, message: 'User deleted', data };
 	}
 
 }

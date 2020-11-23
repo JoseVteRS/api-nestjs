@@ -1,15 +1,11 @@
+import { User } from './interfaces/user.interface';
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { nanoid } from 'nanoid';
 
-import { User } from './schemas/user.schema';
 import { CreateUserDto, EditUserDto } from './dtos';
-import { AppRoles } from '../../app.roles';
 import * as bcrypt from 'bcryptjs';
-
-
-// (!userSchema ? u._id : !!u._id && userSchema._id === u._id ? u._id : null)
 
 @Injectable()
 export class UserService {
@@ -23,19 +19,21 @@ export class UserService {
 		if (!users) {
 			throw new NotFoundException('No se ha podido cargar los usuarios. Inténtalo más tarde')
 		}
+		users.map(user => {
+			user.password = undefined
+		})
 		return users;
 	}
 
-
 	async getOne(id: string, userEntity?: User) {
 		const user = await this.userModel
-		.findById(id)
-		.then(u => (!userEntity ? u : !!u && userEntity.id === u.id ? u : null));
+			.findById(id)
+			.then(u => (!userEntity ? u : !!u && userEntity.id === u.id ? u : null));
 
-	  if (!user)
-		throw new NotFoundException('User does not exists or unauthorized');
+		if (!user)
+			throw new NotFoundException('User does not exists or unauthorized');
 
-	  return user;
+		return user;
 	}
 
 	async checkOne(id: string, userShema?: User) {
@@ -61,13 +59,11 @@ export class UserService {
 		const dtoAlias = dto.alias = `@${dto.alias}`;
 		const dtoPassword = dto.password = await bcrypt.hash(dto.password, 10);
 		const dtoNanoid = dto.uid = nanoid();
-		const dtoRoles = dto.roles = [AppRoles.BASIC_USER]
 
-		return await new this.userModel({ ...dto, dtoAlias, dtoPassword, dtoNanoid, dtoRoles }).save()
+		return await new this.userModel({ ...dto, dtoAlias, dtoPassword, dtoNanoid }).save()
 	}
 
 	async editOne(id: string, dto: EditUserDto, userEntity?: User) {
-		console.log(dto, '----------------------- \n\n\n\n\n\n');
 		const user = await this.getOne(id, userEntity);
 		// const editedUser = Object.assign(user._id, dto);
 		return await this.userModel.findByIdAndUpdate(user._id, dto, { new: true });

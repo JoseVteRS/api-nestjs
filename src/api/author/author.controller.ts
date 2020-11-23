@@ -1,28 +1,37 @@
-// import { User } from './../user/interfaces/user.interface';
-import { Controller, Post, UseGuards, Body, Get, Param, Put, Delete } from '@nestjs/common';
+
+import { Controller, Post, Body, Get, Param, Put, Delete, UnauthorizedException } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthorService } from './author.service';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { CreateAuthorDto } from './dtos/create-author.dto';
-import { EditAuthorDto } from './dtos/edit-author.dto';
+import { CreateAuthorDto, EditAuthorDto } from './dtos';
+
 import { UserRequest } from '../../common/decorators/user.decorator';
+import { Auth } from '../../common/decorators/auth.decorator';
+import { AppResource } from '../../app.roles';
+import { RolesBuilder, InjectRolesBuilder } from 'nest-access-control';
 
 
 @ApiTags('Authors')
 @Controller('author')
 export class AuthorController {
 	constructor(
-		private readonly authorService: AuthorService
+		private readonly authorService: AuthorService,
+		@InjectRolesBuilder()
+		private readonly rolesBuilder: RolesBuilder
 	) { }
 
-	@UseGuards(JwtAuthGuard)
+	@Auth({
+		possession: 'any',
+		action: 'create',
+		resource: AppResource.AUTHOR,
+	})
 	@Post()
 	async createOne(
-		@UserRequest() user: any, // User
+		@UserRequest() user: any,
 		@Body() dto: CreateAuthorDto
 	) {
-		const author = await this.authorService.createOne(user, dto)
-		return author
+		const rule = this.rolesBuilder.can(user.roles).createAny(AppResource.AUTHOR).granted;
+		if(!rule) throw new UnauthorizedException();
+		return await this.authorService.createOne(user, dto);
 	}
 
 	@Get()
@@ -48,7 +57,11 @@ export class AuthorController {
 	}
 
 
-	@UseGuards(JwtAuthGuard)
+	@Auth({
+		possession: 'any',
+		action: 'update',
+		resource: AppResource.AUTHOR,
+	})
 	@Put(':id')
 	async editOne(
 		@Param('id') id: string,
@@ -58,7 +71,11 @@ export class AuthorController {
 		return editedAuthor
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@Auth({
+		possession: 'any',
+		action: 'delete',
+		resource: AppResource.AUTHOR,
+	})
 	@Delete(':id')
 	async deleteOne(
 		@Param('id') id: string

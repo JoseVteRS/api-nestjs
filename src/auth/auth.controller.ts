@@ -7,18 +7,19 @@ import { UserRequest } from '../common/decorators/user.decorator';
 import { LoginDto } from './dtos/login.dto';
 import { LocalAuthGuard, JwtAuthGuard } from './guards';
 import { ApiTags } from '@nestjs/swagger';
+import { UserRegistrationDto } from '../api/user/dtos/user-signup.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
 	constructor(private authServices: AuthService) { }
 
-	// @Post('/signup')
-	// async signUp(
-	// 	@Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto
-	// ): Promise<void> {
-	// 	return await this.authServices.signUp(authCredentialsDto)
-	// }
+	@Post('/signup')
+	async signUp(
+		@Body() dto: UserRegistrationDto
+	) {
+		return await this.authServices.signUp(dto)
+	}
 
 	@UseGuards(LocalAuthGuard)
 	@Post('signin')
@@ -59,7 +60,7 @@ export class AuthController {
 	getMe(
 		@UserRequest() user: User
 	) {
-		return user
+		return user;
 	}
 
 

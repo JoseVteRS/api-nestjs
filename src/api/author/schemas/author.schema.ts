@@ -1,4 +1,5 @@
 import { Schema } from 'mongoose';
+// import mongoosePaginate from 'mongoose-paginate-v2';
 
 export const AuthorSchema = new Schema({
 	slug: { type: String, required: false, unique: true, trim: true },
@@ -7,6 +8,9 @@ export const AuthorSchema = new Schema({
 	uriPhoto: { type: String, required: false, trim: true },
 	birthday: { type: Date, required: false, trim: true },
 	registeredBy: { type: Schema.Types.ObjectId, ref: 'User' },
-	createdAt: { type: Date, default: Date.now },
-	updatedAt: { type: Date, required: false },
+}, {
+	timestamps: true,
+	versionKey: false
 });
+
+// AuthorSchema.plugin(mongoosePaginate);

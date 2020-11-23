@@ -84,7 +84,6 @@ export class GenreService {
 		if (!checkGenre) throw new NotFoundException('No se ha podido obtener los datos del género seleccionado')
 
 		const editedGenre = await this.genreModel.findByIdAndUpdate(id, { dto }, { new: true })
-		dto.updatedAt = new Date()
 
 		return {
 			status: 'OK',

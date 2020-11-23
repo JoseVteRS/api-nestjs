@@ -19,7 +19,7 @@ export class CreateUserDto {
 	alias: string
 
 	@IsString()
-	@IsEmail({}, {message: 'El correo eletrónico debe tener una formato válido. (nombre@dominio.com)'})
+	@IsEmail({}, { message: 'El correo eletrónico debe tener una formato válido. (nombre@dominio.com)' })
 	@IsNotEmpty({
 		message:
 			'Oh, necesita escribir su correo electrónico habitual para poder registrarse',
@@ -49,12 +49,12 @@ export class CreateUserDto {
 
 	@IsArray()
 	@IsOptional()
-	@IsEnum(AppRoles, {each: true, message: `Debe ser un rol válido ${EnumToString(AppRoles)}`})
+	@IsEnum(AppRoles, { each: true, message: `Debe ser un rol válido ${EnumToString(AppRoles)}` })
 	roles: string[]
 
 	@IsOptional()
 	@IsBoolean()
-	isValid: boolean
+	active: boolean
 
 	@IsOptional()
 	@IsBoolean()
@@ -63,9 +63,5 @@ export class CreateUserDto {
 	@IsOptional()
 	@IsBoolean()
 	isVerifiedAccount: boolean
-
-	@IsOptional()
-	@IsDateString()
-	updatedAt: Date
 
 }

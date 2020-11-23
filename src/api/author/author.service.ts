@@ -18,15 +18,15 @@ export class AuthorService {
 
 		if (dto.slug !== undefined) {
 			const slugFromDto = slugifyData(dto.slug)
-			console.log('From DTO', slugFromDto)
+			console.log('>>> From body ', slugFromDto)
 			const checkAuthor = await this.authorModel.findOne({ slug: slugFromDto })
 			if (checkAuthor) throw new BadRequestException(`El autor ${dto.authorName} ya existe. Revísalo`)
 			dto.slug = slugFromDto
 		}
 
-		if (dto.slug === undefined) {
+		if (typeof dto.slug === undefined) {
 			const slugNameFromDto = slugifyData(dto.authorName)
-			console.log('From Name', slugNameFromDto)
+			console.log('>>> From Name ', slugNameFromDto)
 			const checkAuthor = await this.authorModel.findOne({ slug: slugNameFromDto })
 			if (checkAuthor) throw new BadRequestException(`El autor ${dto.authorName} ya existe. Revísalo`)
 			dto.slug = slugNameFromDto
@@ -35,7 +35,7 @@ export class AuthorService {
 		const newAuthor = new this.authorModel(dto)
 		await newAuthor.save()
 
-		newAuthor.registeredBy = _id
+		newAuthor.registeredBy = _id;
 
 		return {
 			status: 'OK',
@@ -48,7 +48,7 @@ export class AuthorService {
 
 	public async getMany() {
 		const authors = await this.authorModel.find()
-		if(!authors) throw new NotFoundException('No se ha podido mostrar los autores')
+		if (!authors) throw new NotFoundException('No se ha podido mostrar los autores')
 		return {
 			status: 'OK',
 			statusCode: 200,
@@ -58,7 +58,8 @@ export class AuthorService {
 	}
 
 	public async getOneById(id: string) {
-		const author = await this.authorModel.findById({ id })
+		const author = await this.authorModel.findById(id)
+		if (!author) throw new NotFoundException('No se ha podido encontrar el autor con ese id')
 		return {
 			status: 'OK',
 			statusCode: 200,
@@ -67,9 +68,9 @@ export class AuthorService {
 		}
 	}
 
-	public async getOneBySlug(slug: string){
-		const author = await this.authorModel.findOne({slug: slug})
-		if(!author) throw new NotFoundException('No se ha podido mostrar el autor')
+	public async getOneBySlug(slug: string) {
+		const author = await this.authorModel.findOne({ slug: slug })
+		if (!author) throw new NotFoundException('No se ha podido encontrar el autor')
 
 		return {
 			status: 'OK',
@@ -80,12 +81,9 @@ export class AuthorService {
 	}
 
 	public async editOneById(id: string, dto: EditAuthorDto) {
-		const checkAuthor = await this.authorModel.findOne({ id })
-		if (!checkAuthor) throw new NotFoundException('No se ha podido obtener los datos del autor seleccionado')
-
-		const editedAuthor = await this.authorModel.findByIdAndUpdate(id,  {dto}, { new: true })
-
-		editedAuthor.updatedAt = new Date()
+		const author = await this.authorModel.findById(id)
+		if (!author) throw new NotFoundException('No se ha podido obtener los datos del autor seleccionado')
+		const editedAuthor = await this.authorModel.findByIdAndUpdate(id, dto, { new: true });
 
 		return {
 			status: 'OK',

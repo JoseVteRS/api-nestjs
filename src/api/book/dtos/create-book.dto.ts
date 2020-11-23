@@ -1,4 +1,4 @@
-import { IsString, IsDateString, IsOptional, IsMongoId, IsNotEmpty, IsArray } from 'class-validator';
+import { IsString, IsDateString, IsOptional, IsMongoId, IsNotEmpty, IsArray, IsBoolean } from 'class-validator';
 
 
 export class CreateBookDto {
@@ -21,7 +21,7 @@ export class CreateBookDto {
 
 	@IsArray()
 	@IsNotEmpty({ message: 'El género del libro es obligatorio' })
-	genre: string
+	genre: string[]
 
 	@IsString()
 	@IsOptional()
@@ -35,20 +35,8 @@ export class CreateBookDto {
 	@IsOptional()
 	isbn13: string
 
-	@IsString()
-	@IsMongoId()
+	@IsBoolean()
 	@IsOptional()
-	registeredBy: string
-
-	@IsString()
-	@IsDateString()
-	@IsOptional()
-	createdAt: Date
-
-	@IsString()
-	@IsDateString()
-	@IsOptional()
-	updatedAt: Date
-
+	isPublic: boolean
 
 }
