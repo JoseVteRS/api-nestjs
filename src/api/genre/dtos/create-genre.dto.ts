@@ -3,7 +3,7 @@ import { IsString, IsOptional, IsNotEmpty, IsMongoId, IsDateString } from 'class
 export class CreateGenreDto {
 
 	@IsString()
-	@IsNotEmpty({ message: 'El nombre del génro es necesario' })
+	@IsNotEmpty({ message: 'El nombre del género es necesario' })
 	genreName: string
 
 	@IsString()

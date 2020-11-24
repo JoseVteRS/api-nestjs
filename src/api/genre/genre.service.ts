@@ -17,14 +17,12 @@ export class GenreService {
 
 
 	public async createOne(user: any, dto: CreateGenreDto) {
-
 		const { _id } = user
-
 		if (dto.slug !== undefined) {
 			const slugFromDto = slugifyData(dto.slug)
 			console.log('From DTO', slugFromDto)
 			const checkGenre = await this.genreModel.findOne({ slug: slugFromDto })
-			if (checkGenre) throw new BadRequestException(`El género ${dto.genreName} ya existe. Revísalo`)
+			if (checkGenre) throw new BadRequestException(`El género '${dto.genreName}' ya existe. Revísalo`)
 			dto.slug = slugFromDto
 		}
 
@@ -32,7 +30,7 @@ export class GenreService {
 			const slugNameFromDto = slugifyData(dto.genreName)
 			console.log('From Name', slugNameFromDto)
 			const checkGenre = await this.genreModel.findOne({ slug: slugNameFromDto })
-			if (checkGenre) throw new BadRequestException(`El género ${dto.genreName} ya existe. Revísalo`)
+			if (checkGenre) throw new BadRequestException(`El género '${dto.genreName}' ya existe. Revísalo`)
 			dto.slug = slugNameFromDto
 		}
 
@@ -83,7 +81,7 @@ export class GenreService {
 		const checkGenre = await this.genreModel.findOne({ _id: id })
 		if (!checkGenre) throw new NotFoundException('No se ha podido obtener los datos del género seleccionado')
 
-		const editedGenre = await this.genreModel.findByIdAndUpdate(id, { dto }, { new: true })
+		const editedGenre = await this.genreModel.findByIdAndUpdate(id, dto, { new: true })
 
 		return {
 			status: 'OK',

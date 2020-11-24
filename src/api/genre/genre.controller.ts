@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Body, Get, Param, Put } from '@nestjs/common';
+import { Controller, Post, UseGuards, Body, Get, Param, Put, Delete } from '@nestjs/common';
 
 import { UserRequest } from '../../common/decorators/user.decorator';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -74,7 +74,7 @@ export class GenreController {
 		action: 'delete',
 		resource: AppResource.GENRE,
 	})
-	@Put(':id')
+	@Delete(':id')
 	async deleteOne(
 		@Param('id') id: string,
 	) {

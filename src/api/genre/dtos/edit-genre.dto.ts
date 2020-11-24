@@ -1,4 +1,16 @@
-import { CreateGenreDto } from './create-genre.dto';
-import { PartialType } from '@nestjs/mapped-types';
+import { IsString, IsOptional, IsNotEmpty, IsMongoId, IsDateString } from 'class-validator';
 
-export class EditGenreDto extends PartialType(CreateGenreDto) {}
+export class EditGenreDto {
+
+  @IsString()
+  @IsNotEmpty({ message: 'El nombre del género es necesario' })
+  genreName: string
+
+  @IsString()
+  @IsOptional()
+  slug: string
+
+  @IsString()
+  @IsOptional()
+  uriPhoto: string
+}

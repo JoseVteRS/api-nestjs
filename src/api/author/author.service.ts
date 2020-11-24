@@ -22,15 +22,15 @@ export class AuthorService {
 			const slugFromDto = slugifyData(dto.slug)
 			console.log('>>> From body ', slugFromDto)
 			const checkAuthor = await this.authorModel.findOne({ slug: slugFromDto })
-			if (checkAuthor) throw new BadRequestException(`El autor ${dto.authorName} ya existe. Revísalo`)
+			if (checkAuthor) throw new BadRequestException(`El autor "${dto.authorName}" ya existe. Revísalo`)
 			dto.slug = slugFromDto
 		}
 
-		if (typeof dto.slug === undefined) {
+		if (dto.slug === undefined) {
 			const slugNameFromDto = slugifyData(dto.authorName)
 			console.log('>>> From Name ', slugNameFromDto)
 			const checkAuthor = await this.authorModel.findOne({ slug: slugNameFromDto })
-			if (checkAuthor) throw new BadRequestException(`El autor ${dto.authorName} ya existe. Revísalo`)
+			if (checkAuthor) throw new BadRequestException(`El autor '${dto.authorName}' ya existe. Revísalo`)
 			dto.slug = slugNameFromDto
 		}
 
