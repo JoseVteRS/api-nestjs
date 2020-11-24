@@ -7,6 +7,7 @@ import { slugifyData } from '../../utils/slugifyData';
 import { AuthorService } from '../author/author.service';
 import { GenreService } from '../genre/genre.service';
 import { EditBookDto } from './dtos/edit-book.dto';
+import { exec } from 'child_process';
 
 // https://stackoverflow.com/questions/51819504/inject-nestjs-service-from-another-module
 @Injectable()
@@ -80,29 +81,39 @@ export class BookService {
 		page = 1,
 		limit = 10
 	) {
-		// const results = await this.bookModel
-		// 	.find()
-		// 	.skip(limit * page)
-		// 	.limit(limit)
-		// 	.exec()
-		// return {
-		// 	results,
-		// 	limit,
-		// 	page,
-		// 	total: await this.bookModel.countDocuments().exec()
-		// }
-
-		const books = await this.bookModel.find()
-		return books
-
+		const total = await this.bookModel.countDocuments().exec();
+		const totalPages = Math.ceil(total / limit);
+		const results = await this.bookModel
+			.find()
+			.skip((page - 1) * limit)
+			.limit(limit)
+			.populate('author', '_id authorName slug')
+			.populate('genre', '_id genreName slug')
+			.populate('registeredBy', '_id username email')
+			.exec()
+		return {
+			results,
+			limit,
+			page,
+			totalPages,
+			totalDocs: total,
+		}
 	}
 
-	public async getBooksSameAuthor(id: string) {
+	public async getBooksSameAuthor(id: string, page = 1, limit = 10) {
+		const total = await this.bookModel.find({ author: { $eq: id } }).countDocuments().exec();
+		const totalPages = Math.ceil(total / limit);
+
 		const books = await this.bookModel.find({
 			author: { $eq: id }
 		})
+			.find()
+			.skip((page - 1) * limit)
+			.limit(limit)
 			.populate('author', '_id authorName slug')
 			.populate('genre', '_id genreName slug')
+			.exec()
+
 		const author = await this.authorService.getOneById(id)
 		return {
 			status: 'OK',
@@ -110,25 +121,41 @@ export class BookService {
 			message: `Se han encontrado libros con el mismo autor`,
 			result: {
 				author,
-				books
+				books,
+				limit,
+				page,
+				totalPages,
+				totalDocs: total,
 			}
 		}
 	}
 
-	public async getBooksSameGenre(id: string) {
+	public async getBooksSameGenre(id: string, page = 1, limit = 10) {
+		const total = await this.bookModel.find({ genre: { $eq: id } }).countDocuments().exec();
+		const totalPages = Math.ceil(total / limit);
 		const books = await this.bookModel.find({
 			genre: { $eq: id }
 		})
+			.find()
+			.skip((page - 1) * limit)
+			.limit(limit)
 			.populate('author', '_id authorName slug')
 			.populate('genre', '_id genreName slug')
+			.exec()
+
 		const genre = await this.genreService.getOneById(id)
+
 		return {
 			status: 'OK',
 			statusCode: 200,
 			message: `Se han encontrado libros con el mismo género`,
 			result: {
 				genre,
-				books
+				books,
+				limit,
+				page,
+				totalPages,
+				totalDocs: total,
 			}
 		}
 	}
@@ -155,14 +182,7 @@ export class BookService {
 	public async deleteOne(id: string) {
 		const book = this.bookModel.findOneAndDelete({ _id: id })
 		if (!book) throw new NotFoundException('No se ha podido encontrar el libro con ese id')
-		return {
-			status: 'OK',
-			statusCode: 200,
-			message: `El libro se ha eliminado correctamente`,
-			result: book
-		}
+		return book
 	}
-
-
 
 }
