@@ -91,6 +91,7 @@ export class BookService {
 			.populate('genre', '_id genreName slug')
 			.populate('registeredBy', '_id username email')
 			.exec()
+		if (!results) throw new NotFoundException('No se han encontrado libros')
 		return {
 			results,
 			limit,

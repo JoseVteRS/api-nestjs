@@ -1,5 +1,5 @@
 
-import { Controller, Post, Body, Get, Param, Put, Delete, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put, Delete, UnauthorizedException, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthorService } from './author.service';
 import { CreateAuthorDto, EditAuthorDto } from './dtos';
@@ -30,14 +30,23 @@ export class AuthorController {
 		@Body() dto: CreateAuthorDto
 	) {
 		const rule = this.rolesBuilder.can(user.roles).createAny(AppResource.AUTHOR).granted;
-		if(!rule) throw new UnauthorizedException();
+		if (!rule) throw new UnauthorizedException();
 		return await this.authorService.createOne(user, dto);
 	}
 
 	@Get()
-	async getMany() {
-		const authors = await this.authorService.getMany()
-		return authors
+	async getMany(
+		@Query('page') page?: string,
+		@Query('limit') limit?: string,
+	) {
+		const p = parseInt(page);
+		const l = parseInt(limit);
+
+		const authors = await this.authorService.getMany(
+			p,
+			l,
+		)
+		return authors;
 	}
 
 	@Get(':id')

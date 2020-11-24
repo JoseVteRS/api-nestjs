@@ -6,6 +6,8 @@ import { Author } from './interfaces/author.interface'
 import { CreateAuthorDto, EditAuthorDto } from './dtos';
 import { slugifyData } from '../../utils/slugifyData';
 
+import { ErrorMessages } from '../common/messages.enum'
+
 
 @Injectable()
 export class AuthorService {
@@ -46,20 +48,31 @@ export class AuthorService {
 	}
 
 
-	public async getMany() {
-		const authors = await this.authorModel.find()
-		if (!authors) throw new NotFoundException('No se ha podido mostrar los autores')
+	public async getMany(page = 1, limit = 10) {
+		const total = await this.authorModel.countDocuments().exec();
+		const totalPages = Math.ceil(total / limit);
+
+		const results = await this.authorModel
+			.find()
+			.skip((page - 1) * limit)
+			.limit(limit)
+			.populate('registeredBy', '_id username alias email')
+		if (!results) throw new NotFoundException('No se han encontrado autores')
 		return {
 			status: 'OK',
 			statusCode: 200,
 			message: 'Todos los autores',
-			authors
+			results,
+			limit,
+			page,
+			totalPages,
+			totalDocs: total
 		}
 	}
 
 	public async getOneById(id: string) {
 		const author = await this.authorModel.findById(id)
-		if (!author) throw new NotFoundException('No se ha podido encontrar el autor con ese id')
+		if (!author) throw new NotFoundException('No se ha encontrado autor con ese id')
 		return {
 			status: 'OK',
 			statusCode: 200,
@@ -81,10 +94,11 @@ export class AuthorService {
 	}
 
 	public async editOneById(id: string, dto: EditAuthorDto) {
-		const author = await this.authorModel.findById(id)
-		if (!author) throw new NotFoundException('No se ha podido obtener los datos del autor seleccionado')
-		const editedAuthor = await this.authorModel.findByIdAndUpdate(id, dto, { new: true });
 
+		const editedAuthor = await this.authorModel.findByIdAndUpdate(id, dto, { new: true });
+		if (!editedAuthor) throw new NotFoundException('No se ha podido obtener los datos del autor seleccionado')
+		if (!dto.authorName) throw new BadRequestException(`El NOMBRE AUTOR es obligatorio`)
+		console.log(ErrorMessages.AUTHORNAME_BAD_REQUEST)
 		return {
 			status: 'OK',
 			statusCode: 200,
