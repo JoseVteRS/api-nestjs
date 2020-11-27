@@ -9,6 +9,7 @@ import { slugifyData } from '../../utils/slugifyData';
 import { AppRoles } from '../../app.roles';
 import { User } from '../user/interfaces/user.interface';
 import { isAdmin } from '../common/isAdmin';
+import { notContains } from 'class-validator';
 
 @Injectable()
 export class ListsService {
@@ -93,7 +94,6 @@ export class ListsService {
     } else {
       throw new ForbiddenException('Acceso denegado')
     }
-
   }
 
   /**
@@ -211,7 +211,7 @@ export class ListsService {
     }
   }
 
-  public async findRandom() {
+  public async findRandom(size = 5) {
     const randomLists = await this.listModel.aggregate(
       [
         {
@@ -221,7 +221,7 @@ export class ListsService {
         },
         {
           '$sample': {
-            'size': 5
+            'size': size
           }
         },
       ]
@@ -246,21 +246,56 @@ export class ListsService {
 
     if (!admin && ownerListId !== userId) {
       const onlyPublicList = await this.listModel.findOne({ _id: id, isPublic: true })
-      if (!onlyPublicList) throw new NotFoundException('No hay lista que mostrar publica');
+      if (!onlyPublicList) throw new ForbiddenException('Lista privada');
       return onlyPublicList;
     } else {
       const list = await this.listModel.findById(id);
-      if (!list) throw new NotFoundException('No hay lista que mostrar privadas');
+      if (!list) throw new NotFoundException('No hay lista que mostrar');
       return list
     }
   }
 
 
-  public async update(id: number, updateListDto: UpdateListDto) {
-    return `This action updates a #${id} list`;
+
+  public async update(id: string, dto: UpdateListDto, user: User) {
+    const list = await this.listModel.findById(id);
+    const admin = isAdmin(user.roles.toString());
+    const ownerListId = list.owner.toString();
+    const userId = user._id.toString();
+    if (!list) throw new NotFoundException('No se ha podido obtener la lista');
+
+    if (!admin && ownerListId !== userId) {
+      throw new ForbiddenException('Forbidden')
+    } else {
+      const updatedList = await this.listModel.findByIdAndUpdate(id, dto, { new: true });
+      return {
+        status: 'OK',
+        statusCode: 200,
+        message: `Lista ${updatedList.title} ha sido modificada`,
+        result: updatedList
+      }
+    }
   }
 
-  public async remove(id: number) {
-    return `This action removes a #${id} list`;
+  public async remove(id: string, user: User) {
+    const list = await this.listModel.findById(id);
+    const admin = isAdmin(user.roles.toString());
+    const ownerListId = list?.owner.toString();
+    const userId = user._id.toString();
+    if (!list) throw new NotFoundException('No se ha podido eliminar la lista o la lista no existe');
+
+    if (!admin && ownerListId !== userId) {
+      throw new ForbiddenException('Forbidden')
+    } else {
+      const deletedList = await this.listModel.findByIdAndDelete(id);
+      if (!deletedList) throw new NotFoundException('Lista no encontrada')
+      return {
+        status: 'OK',
+        statusCode: 200,
+        message: `Lista ${deletedList.title} ha sido eliminada`,
+        result: deletedList
+      }
+    }
   }
+
 }

@@ -37,7 +37,7 @@ roles
 	.updateAny([AppResource.BOOK, AppResource.AUTHOR, AppResource.GENRE, AppResource.LIST])
 	.deleteAny([AppResource.BOOK, AppResource.AUTHOR, AppResource.GENRE])
 	// ADMIN ROLES
-	.grant(AppRoles.MODERATOR)
+	.grant(AppRoles.ADMIN)
 	.extend(AppRoles.BASIC_USER)
 	.createAny([AppResource.USER, AppResource.BOOK, AppResource.AUTHOR, AppResource.GENRE, AppResource.LIST])
 	.updateAny([AppResource.USER, AppResource.BOOK, AppResource.AUTHOR, AppResource.GENRE, AppResource.LIST])

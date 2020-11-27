@@ -3,7 +3,7 @@ import { ListsService } from './lists.service';
 import { CreateListDto } from './dto/create-list.dto';
 import { UpdateListDto } from './dto/update-list.dto';
 import { Auth } from '../../common/decorators';
-import { AppResource } from '../../app.roles';
+import { AppResource, AppRoles } from '../../app.roles';
 import { UserRequest } from '../../common/decorators/user.decorator';
 import { User } from '../user/interfaces/user.interface';
 import { RolesBuilder, InjectRolesBuilder } from 'nest-access-control';
@@ -87,8 +87,10 @@ export class ListsController {
 
 
   @Get('random')
-  public async findRandom() {
-    const lists = await this.listsService.findRandom()
+  public async findRandom(
+    @Query('size') size: number
+  ) {
+    const lists = await this.listsService.findRandom(+size)
     return lists;
   }
 
@@ -121,8 +123,6 @@ export class ListsController {
     @Param('id') id: string,
     @UserRequest() user: User
   ) {
-    // let data: any;
-    // const rule = this.rolesBuilder.can(user.roles).readAny(AppResource.LIST).granted;
     const list = await this.listsService.findOneList(id, user);
     return list;
   }
@@ -141,13 +141,36 @@ export class ListsController {
   }
 
 
+  @Auth({
+    possession: 'own',
+    action: 'update',
+    resource: AppResource.LIST,
+  })
   @Put(':id')
-  update(@Param('id') id: any, @Body() updateListDto: UpdateListDto) {
-    return this.listsService.update(id, updateListDto);
+  public async update(
+    @Param('id') id: any,
+    @Body() dto: UpdateListDto,
+    @UserRequest() user: User
+  ) {
+    // let data: any;
+    // const rule = this.rolesBuilder.can(user.roles).updateAny(AppResource.LIST).granted;
+    const updatedList = await this.listsService.update(id, dto, user);
+    return updatedList;
   }
 
+
+  @Auth({
+    possession: 'own',
+    action: 'delete',
+    resource: AppResource.LIST,
+  })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.listsService.remove(+id);
+  remove(
+    @Param('id') id: string,
+    @UserRequest() user: User
+
+  ) {
+    const deletedList = this.listsService.remove(id, user);
+    return deletedList;
   }
 }

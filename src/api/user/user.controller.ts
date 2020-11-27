@@ -66,7 +66,7 @@ export class UserController {
 			// esto es un admin
 			data = await this.userService.editOne(id, dto);
 		} else {
-			// esto es un author
+			// esto es un owner
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { roles, ...rest } = dto;
 			data = await this.userService.editOne(id, rest, user);

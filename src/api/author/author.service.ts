@@ -98,7 +98,6 @@ export class AuthorService {
 		const editedAuthor = await this.authorModel.findByIdAndUpdate(id, dto, { new: true });
 		if (!editedAuthor) throw new NotFoundException('No se ha podido obtener los datos del autor seleccionado')
 		if (!dto.authorName) throw new BadRequestException(`El NOMBRE AUTOR es obligatorio`)
-		console.log(ErrorMessages.AUTHORNAME_BAD_REQUEST)
 		return {
 			status: 'OK',
 			statusCode: 200,
