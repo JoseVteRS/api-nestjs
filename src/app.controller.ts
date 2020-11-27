@@ -1,12 +1,18 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Request, Response } from '@nestjs/common';
 import { AppService } from './app.service';
 
-@Controller('api/v1')
+
+@Controller('/')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly appService: AppService) { }
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  getHello(
+    @Response() res: any, @Request() req: any): object {
+    // res.cookie('XSRF-TOKEN', req.csrfToken());
+    const hello = this.appService.getHello(res, req);
+    return {
+      hello
+    }
   }
 }

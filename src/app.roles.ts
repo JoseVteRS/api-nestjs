@@ -24,8 +24,12 @@ roles
 	.updateOwn([AppResource.USER])
 	.deleteOwn([AppResource.USER])
 	.createOwn([AppResource.LIST])
+	.readAny([AppResource.LIST])
 	.updateOwn([AppResource.LIST])
 	.deleteOwn([AppResource.LIST])
+	// SUBSCRIPTOR
+	.grant(AppRoles.SUBSCRIPTOR)
+	.extend(AppRoles.BASIC_USER)
 	// MODERATOR ROLES
 	.grant(AppRoles.MODERATOR)
 	.extend(AppRoles.BASIC_USER)
@@ -42,6 +46,7 @@ roles
 	.grant(AppRoles.SUPER_ADMIN)
 	.extend(AppRoles.BASIC_USER)
 	.createAny([AppResource.LIST, AppResource.USER, AppResource.BOOK, AppResource.AUTHOR, AppResource.GENRE])
+	.readAny([AppResource.LIST, AppResource.USER, AppResource.BOOK, AppResource.AUTHOR, AppResource.GENRE])
 	.updateAny([AppResource.LIST, AppResource.USER, AppResource.BOOK, AppResource.AUTHOR, AppResource.GENRE])
 	.deleteAny([AppResource.LIST, AppResource.USER, AppResource.BOOK, AppResource.AUTHOR, AppResource.GENRE]);
 

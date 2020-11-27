@@ -1,4 +1,4 @@
-import { IsString, IsDateString, IsOptional, IsMongoId, IsNotEmpty, IsArray, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, IsNotEmpty, IsArray, IsBoolean } from 'class-validator';
 
 
 export class CreateBookDto {

@@ -8,6 +8,7 @@ import { UserService } from 'src/api/user/user.service';
 import { UserRegistrationDto } from '../api/user/dtos/';
 import { nanoid } from 'nanoid';
 import { User } from 'src/api/user/interfaces/user.interface';
+import { TokenPayload } from './interfaces/tokenPayload.interface';
 
 
 
@@ -20,15 +21,19 @@ export class AuthService {
 	) { }
 
 
-
 	async signIn(user: User) {
 		const payload = { sub: user._id }
 		user.password = undefined
-		console.log(user)
 		return {
 			user,
 			accessToken: this.jwtService.sign(payload)
 		}
+	}
+
+	public getCookieWithJwtToken(sub: string) {
+		const payload: TokenPayload = { sub };
+		const token = this.jwtService.sign(payload);
+		return `Authentication=${token}; HttpOnly; Path=/; Max-Age=3600`;
 	}
 
 	async signUp(dto: UserRegistrationDto) {
@@ -48,13 +53,11 @@ export class AuthService {
 
 	async validateUser(email: string, pass: string): Promise<User> {
 		const user = await this.userModel.findOne({ email });
-		console.log(user)
 		if (!user) {
 			return null;
 		}
 
 		const valid = await bcrypt.compare(pass, user.password);
-		console.log('Válido: ', valid)
 
 		if (valid) {
 			return user;
@@ -62,6 +65,9 @@ export class AuthService {
 
 		return null;
 	}
+
+
+
 
 
 }

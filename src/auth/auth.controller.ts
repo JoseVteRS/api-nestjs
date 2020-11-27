@@ -1,13 +1,13 @@
 import { Controller, Post, UseGuards, Get, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
-// import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+
 
 import { User } from '../api/user/interfaces/user.interface';
 import { UserRequest } from '../common/decorators/user.decorator';
-import { LoginDto } from './dtos/login.dto';
 import { LocalAuthGuard, JwtAuthGuard } from './guards';
 import { ApiTags } from '@nestjs/swagger';
 import { UserRegistrationDto } from '../api/user/dtos/user-signup.dto';
+
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -24,14 +24,20 @@ export class AuthController {
 	@UseGuards(LocalAuthGuard)
 	@Post('signin')
 	async signIn(
-		@Body() loginDto: LoginDto,
 		@UserRequest() user: User
 	) {
-		const data = await this.authServices.signIn(user)
+
+		const data = await this.authServices.signIn(user);
 		const { accessToken } = data
 		user.password = undefined
 		user.email = undefined
-		console.log(data)
+
+		// const cookie = this.authServices.getCookieWithJwtToken(user._id);
+		// res.setHeader('Set-Cookie-Token', cookie);
+		// user.password = undefined;
+		// user.email = undefined;
+		// return res.send(user);
+
 		return {
 			status: 'OK',
 			statusCode: 200,

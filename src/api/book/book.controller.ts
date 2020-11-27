@@ -1,11 +1,11 @@
-import { Controller, Post, Body, Delete, Param, Get, NotFoundException, Query, Put } from '@nestjs/common';
+import { Controller, Post, Body, Delete, Param, Get, Query, Put } from '@nestjs/common';
 import { BookService } from './book.service';
 import { CreateBookDto } from './dtos/create-book.dto';
 import { UserRequest } from '../../common/decorators/user.decorator';
 import { Auth } from '../../common/decorators'
+
 import { ApiTags } from '@nestjs/swagger';
 import { AppResource } from 'src/app.roles';
-import { InjectRolesBuilder, RolesBuilder } from 'nest-access-control';
 import { User } from '../user/interfaces/user.interface';
 import { EditBookDto } from './dtos/edit-book.dto';
 
