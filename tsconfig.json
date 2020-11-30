@@ -9,7 +9,18 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
-    "incremental": true
+    "incremental": true,
+    "paths": {
+      "@Src/*": ["src/*"],
+      "@Users/*": ["src/api/user/*"],
+      "@Author/*": ["src/api/author/*"],
+      "@Genre/*": ["src/api/genre/*"],
+      "@Book/*": ["src/api/book/*"],
+      "@List/*": ["src/api/lists/*"],
+      "@Like/*": ["src/api/like/*"],
+      "@Follow/*": ["src/api/follow/*"],
+      "@Common/*": ["src/api/common/*"],
+    }
   },
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "upload"]
 }

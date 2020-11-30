@@ -16,4 +16,3 @@ export const BookSchema = new Schema({
 	timestamps: true,
 	versionKey: false
 })
-

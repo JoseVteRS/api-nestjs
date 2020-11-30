@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Get, Body } from '@nestjs/common';
+import { Controller, Post, UseGuards, Get, Body, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 
@@ -14,7 +14,7 @@ import { UserRegistrationDto } from '../api/user/dtos/user-signup.dto';
 export class AuthController {
 	constructor(private authServices: AuthService) { }
 
-	@Post('/signup')
+	@Post('signup')
 	async signUp(
 		@Body() dto: UserRegistrationDto
 	) {
@@ -24,19 +24,16 @@ export class AuthController {
 	@UseGuards(LocalAuthGuard)
 	@Post('signin')
 	async signIn(
-		@UserRequest() user: User
+		@UserRequest() user: User,
+		@Request() req: any
 	) {
 
 		const data = await this.authServices.signIn(user);
 		const { accessToken } = data
+		req.session.token = accessToken
+		console.log(req.session);
 		user.password = undefined
 		user.email = undefined
-
-		// const cookie = this.authServices.getCookieWithJwtToken(user._id);
-		// res.setHeader('Set-Cookie-Token', cookie);
-		// user.password = undefined;
-		// user.email = undefined;
-		// return res.send(user);
 
 		return {
 			status: 'OK',

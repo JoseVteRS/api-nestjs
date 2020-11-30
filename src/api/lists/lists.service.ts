@@ -9,7 +9,6 @@ import { slugifyData } from '../../utils/slugifyData';
 import { AppRoles } from '../../app.roles';
 import { User } from '../user/interfaces/user.interface';
 import { isAdmin } from '../common/isAdmin';
-import { notContains } from 'class-validator';
 
 @Injectable()
 export class ListsService {
@@ -30,7 +29,6 @@ export class ListsService {
   public async create(dto: CreateListDto, user: any) {
     const titleSlugified = slugifyData(dto.title)
     const listLength = await this.listModel.countDocuments({ owner: user._id }).exec()
-
 
     /**
      * Condición para comprobar si el usuario es `BASIC_USER` y ya ha creado 3 listas

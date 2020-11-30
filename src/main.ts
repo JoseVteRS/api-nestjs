@@ -46,17 +46,17 @@ async function bootstrap() {
 	app.use(bodyParser.urlencoded({ extended: false }));
 	app.use(cookieParser());
 	app.use(session({
-		secret: process.env.SESSION_KEY || 'algosupersecreto',
+		secret: process.env.SESSION_KEY,
 		resave: true,
 		saveUninitialized: true,
 		cookie: { secure: false, maxAge: process.env.COOKIE_MAX_AGE || 1000 * 60 * 60 * 24 * 30 }
 	}));
 
-	// app.use(csurf({ cookie: { key: '_csrf', sameSite: true } }));
+	// app.use(csurf({ cookie: { key: 'CSRFToken', sameSite: false } }));
 
 	app.use(
 		rateLimit({
-			windowMs: 15 * 60 * 1000, // 15 minutes
+			windowMs: 1000 * 60 * 15, // 15 minutes
 			max: 100, // limit each IP to 100 requests per windowMs
 		}),
 	);

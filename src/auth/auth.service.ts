@@ -22,7 +22,7 @@ export class AuthService {
 
 
 	async signIn(user: User) {
-		const payload = { sub: user._id }
+		const payload: TokenPayload = { sub: user._id }
 		user.password = undefined
 		return {
 			user,
@@ -56,13 +56,10 @@ export class AuthService {
 		if (!user) {
 			return null;
 		}
-
 		const valid = await bcrypt.compare(pass, user.password);
-
 		if (valid) {
 			return user;
 		}
-
 		return null;
 	}
 

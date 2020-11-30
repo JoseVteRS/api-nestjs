@@ -1,6 +1,4 @@
 import { Document } from 'mongoose';
-
-
 export class List extends Document {
   title: string
   books: string[]
