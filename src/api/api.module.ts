@@ -6,9 +6,10 @@ import { BookModule } from './book/book.module';
 import { ListsModule } from './lists/lists.module';
 import { LikeModule } from './like/like.module';
 import { FollowModule } from './follow/follow.module';
+import { StripeModule } from './stripe/stripe.module';
 
 
 @Module({
-  imports: [UserModule, AuthorModule, GenreModule, BookModule, ListsModule, LikeModule, FollowModule]
+  imports: [UserModule, AuthorModule, GenreModule, BookModule, ListsModule, LikeModule, FollowModule, StripeModule]
 })
 export class ApiModule { }

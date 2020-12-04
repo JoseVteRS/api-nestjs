@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller('/')
@@ -13,5 +13,14 @@ export class AppController {
     return {
       nevook
     }
+  }
+
+  @Post('customers')
+  async getStripe(
+    @Body() body: any
+  ) {
+    const { name, email, description } = body
+    const stripe = this.appService.createCustomer(name, email, description);
+    return stripe
   }
 }
