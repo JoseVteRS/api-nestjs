@@ -4,6 +4,8 @@
 
 #environments
 .env
+.env.production
+.env.development
 
 # Logs
 logs
