@@ -15,7 +15,7 @@ import { ConfigModule } from '@nestjs/config';
 		DataBaseModule,
 		ConfigModule.forRoot({
 			isGlobal: true,
-			envFilePath: '.env'
+			envFilePath: '.env.development',
 		}),
 		AccessControlModule.forRoles(roles),
 		AuthModule,
