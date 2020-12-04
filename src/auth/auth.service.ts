@@ -12,6 +12,7 @@ import { TokenPayload } from './interfaces/tokenPayload.interface';
 
 
 
+
 @Injectable()
 export class AuthService {
 	constructor(
@@ -24,9 +25,21 @@ export class AuthService {
 	async signIn(user: User) {
 		const payload: TokenPayload = { sub: user._id }
 		user.password = undefined
+
 		return {
 			user,
 			accessToken: this.jwtService.sign(payload)
+		}
+	}
+
+	googleLogin(req) {
+		if (!req.user) {
+			return 'No user from google'
+		}
+
+		return {
+			message: 'User information from google',
+			user: req.user
 		}
 	}
 

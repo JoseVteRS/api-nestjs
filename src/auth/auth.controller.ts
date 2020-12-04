@@ -1,12 +1,12 @@
-import { Controller, Post, UseGuards, Get, Body, Request } from '@nestjs/common';
-import { AuthService } from './auth.service';
-
-
-import { User } from '../api/user/interfaces/user.interface';
-import { UserRequest } from '../common/decorators/user.decorator';
-import { LocalAuthGuard, JwtAuthGuard } from './guards';
+import { Controller, Req, Post, UseGuards, Get, Body, Headers } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { UserRegistrationDto } from '../api/user/dtos/user-signup.dto';
+import { AuthGuard } from '@nestjs/passport';
+
+import { UserRequest } from '@Src/common/decorators/user.decorator';
+import { AuthService } from '@Auth/auth.service';
+import { LocalAuthGuard, JwtAuthGuard } from '@Auth/guards';
+import { User } from '@Users/interfaces/user.interface';
+import { UserRegistrationDto } from '@Users/dtos/user-signup.dto';
 
 
 @ApiTags('Auth')
@@ -25,13 +25,13 @@ export class AuthController {
 	@Post('signin')
 	async signIn(
 		@UserRequest() user: User,
-		@Request() req: any
+		@Req() req: any,
 	) {
 
 		const data = await this.authServices.signIn(user);
 		const { accessToken } = data
 		req.session.token = accessToken
-		console.log(req.session);
+		// console.log(req.session);
 		user.password = undefined
 		user.email = undefined
 
@@ -66,7 +66,15 @@ export class AuthController {
 		return user;
 	}
 
+	@Get('google')
+	@UseGuards(AuthGuard('google'))
+	async googleAuth(@Req() req) { }
 
+	@Get('google/redirect')
+	@UseGuards(AuthGuard('google'))
+	googleAuthRedirect(@Req() req) {
+		return this.authServices.googleLogin(req)
+	}
 
 
 

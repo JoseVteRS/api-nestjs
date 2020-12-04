@@ -52,7 +52,7 @@ async function bootstrap() {
 		cookie: { secure: false, maxAge: process.env.COOKIE_MAX_AGE || 1000 * 60 * 60 * 24 * 30 }
 	}));
 
-	// app.use(csurf({ cookie: { key: 'CSRFToken', sameSite: false } }));
+	// app.use(csurf({ cookie: { key: '_csrf', sameSite: false } }));
 
 	app.use(
 		rateLimit({

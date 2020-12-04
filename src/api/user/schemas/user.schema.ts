@@ -12,7 +12,7 @@ export const UserSchema = new Schema({
 		required: 'Email address is required',
 		match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
 	},
-	password: { type: String, required: true, trim: true, minlength: 6 },
+	password: { type: String, required: false, trim: true, minlength: 6 },
 	uriAvatar: { type: String, required: false, trim: true },
 	genre: { type: String, required: false, trim: true },
 	secretKeyConfirmation: { type: String, required: false, trim: true },

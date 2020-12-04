@@ -11,22 +11,25 @@ import { JwtStrategy } from './strategies/jwt-auth.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { UserSchema } from '../api/user/schemas/user.schema';
 import { AuthController } from './auth.controller';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
 	imports: [
+		ConfigModule.forRoot(),
 		PassportModule.register({
 			defaultStrategy: 'jwt'
 		}),
-		ConfigModule.forRoot(),
-		MongooseModule.forFeature([{name: 'User', schema: UserSchema}]),
+		MongooseModule.forFeature([
+			{ name: 'User', schema: UserSchema }
+		]),
 		JwtModule.register({
 			secret: process.env.JWT_SECRET,
-			signOptions: { expiresIn: '24h'}
+			signOptions: { expiresIn: '24h' }
 		}),
 		UserModule,
 	],
 	controllers: [AuthController],
-	exports:[AuthService],
-	providers: [AuthService, LocalStrategy, JwtStrategy],
+	exports: [AuthService],
+	providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],
 })
-export class AuthModule {}
+export class AuthModule { }

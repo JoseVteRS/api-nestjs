@@ -13,6 +13,7 @@
     "paths": {
       "@Src/*": ["src/*"],
       "@Users/*": ["src/api/user/*"],
+      "@Auth/*": ["src/auth/*"],
       "@Author/*": ["src/api/author/*"],
       "@Genre/*": ["src/api/genre/*"],
       "@Book/*": ["src/api/book/*"],
