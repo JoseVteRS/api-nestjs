@@ -1,4 +1,4 @@
-import { Controller, Req, Post, UseGuards, Get, Body, Headers } from '@nestjs/common';
+import { Controller, Req, Post, UseGuards, Get, Body } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -31,7 +31,6 @@ export class AuthController {
 		const data = await this.authServices.signIn(user);
 		const { accessToken } = data
 		req.session.token = accessToken
-		// console.log(req.session);
 		user.password = undefined
 		user.email = undefined
 
@@ -68,7 +67,7 @@ export class AuthController {
 
 	@Get('google')
 	@UseGuards(AuthGuard('google'))
-	async googleAuth(@Req() req) { }
+	googleAuth(@Req() req) { }
 
 	@Get('google/redirect')
 	@UseGuards(AuthGuard('google'))

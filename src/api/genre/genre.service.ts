@@ -20,7 +20,6 @@ export class GenreService {
 		const { _id } = user
 		if (dto.slug !== undefined) {
 			const slugFromDto = slugifyData(dto.slug)
-			console.log('From DTO', slugFromDto)
 			const checkGenre = await this.genreModel.findOne({ slug: slugFromDto })
 			if (checkGenre) throw new BadRequestException(`El género '${dto.genreName}' ya existe. Revísalo`)
 			dto.slug = slugFromDto
@@ -28,7 +27,6 @@ export class GenreService {
 
 		if (dto.slug === undefined) {
 			const slugNameFromDto = slugifyData(dto.genreName)
-			console.log('From Name', slugNameFromDto)
 			const checkGenre = await this.genreModel.findOne({ slug: slugNameFromDto })
 			if (checkGenre) throw new BadRequestException(`El género '${dto.genreName}' ya existe. Revísalo`)
 			dto.slug = slugNameFromDto
